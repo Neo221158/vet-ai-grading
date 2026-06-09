@@ -11,6 +11,7 @@
     --accent:#b4541f; --good:#1f6f6b;
     --radius:14px; --shadow:0 1px 3px rgba(20,30,50,.08),0 8px 24px rgba(20,30,50,.06);
     --maxw:1100px;
+    --resp-size:15px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -39,8 +40,15 @@
   input:focus, textarea:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-tint)}
   textarea{min-height:80px; resize:vertical}
   .rate-grid{display:grid; grid-template-columns:1.15fr .95fr; gap:18px; align-items:start}
-  .resp-card .resp-scroll{max-height:64vh; overflow:auto; padding-right:6px; white-space:pre-wrap; font-size:15px; color:#222b39}
-  .qbanner{background:var(--primary-tint); border:1px solid #c9e4e2; color:var(--primary-d); border-radius:10px; padding:12px 14px; font-size:15px; margin-bottom:16px}
+  .resp-card .resp-scroll{max-height:64vh; overflow:auto; padding-right:6px; white-space:pre-wrap; font-size:var(--resp-size); line-height:1.6; color:#222b39}
+  .qbanner{background:var(--primary-tint); border:1px solid #c9e4e2; color:var(--primary-d); border-radius:10px; padding:12px 14px; font-size:var(--resp-size); margin-bottom:16px}
+  .textsize{display:flex; align-items:center; gap:5px}
+  .textsize button{width:34px; height:30px; border:1.5px solid var(--line); background:#fff; border-radius:8px; cursor:pointer; color:var(--ink); font-weight:700; line-height:1; padding:0; transition:all .12s}
+  .textsize button:hover{border-color:var(--primary); background:var(--primary-tint)}
+  .textsize button:disabled{opacity:.4; cursor:not-allowed}
+  .textsize .ts-sm{font-size:12px}
+  .textsize .ts-lg{font-size:17px}
+  .textsize .ts-reset{font-size:11px; width:auto; padding:0 8px; color:var(--ink-soft)}
   .qbanner b{display:block; font-size:12px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; color:var(--primary)}
   .chip{display:inline-block; background:var(--ink); color:#fff; font-size:12px; font-weight:700; padding:3px 10px; border-radius:99px; letter-spacing:.04em}
   .metric{margin:0 0 18px}
@@ -79,6 +87,11 @@
     <div class="brand">Vet-Ophthalmology AI Grading</div>
     <div class="progress" aria-hidden="true"><i id="bar"></i></div>
     <div class="progress-label" id="plabel">&nbsp;</div>
+    <div class="textsize" role="group" aria-label="Text size">
+      <button class="ts-sm" id="tsDown" title="Smaller text" aria-label="Smaller text">A&minus;</button>
+      <button class="ts-reset" id="tsReset" title="Reset text size" aria-label="Reset text size">Reset</button>
+      <button class="ts-lg" id="tsUp" title="Larger text" aria-label="Larger text">A+</button>
+    </div>
   </div>
 </header>
 
@@ -116,6 +129,27 @@ var state = load() || {graderId:"", email:"", answers:{}, idx:0, submitted:false
 
 function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 function load(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){ return null; } }
+
+/* ============ TEXT SIZE ============ */
+var TEXT_MIN=13, TEXT_MAX=24, TEXT_DEFAULT=15, TEXT_STEP=1.5;
+function applyTextScale(){
+  var px=state.textPx; if(typeof px!=="number"||isNaN(px)){ px=TEXT_DEFAULT; }
+  px=Math.max(TEXT_MIN, Math.min(TEXT_MAX, px)); state.textPx=px;
+  document.documentElement.style.setProperty("--resp-size", px+"px");
+  var down=document.getElementById("tsDown"), up=document.getElementById("tsUp");
+  if(down) down.disabled = (px<=TEXT_MIN);
+  if(up)   up.disabled   = (px>=TEXT_MAX);
+}
+function bumpTextScale(delta){
+  var px=(typeof state.textPx==="number"&&!isNaN(state.textPx))?state.textPx:TEXT_DEFAULT;
+  state.textPx=px+delta; applyTextScale(); save();
+}
+function wireTextSize(){
+  var down=document.getElementById("tsDown"), up=document.getElementById("tsUp"), reset=document.getElementById("tsReset");
+  if(down) down.onclick=function(){ bumpTextScale(-TEXT_STEP); };
+  if(up)   up.onclick  =function(){ bumpTextScale(TEXT_STEP); };
+  if(reset)reset.onclick=function(){ state.textPx=TEXT_DEFAULT; applyTextScale(); save(); };
+}
 
 /* ============ RENDER ============ */
 var root=document.getElementById("root");
@@ -346,6 +380,8 @@ function downloadBackup(){
 function valOf(id){ var el=document.getElementById(id); return el?el.value.trim():""; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
+wireTextSize();
+applyTextScale();
 render();
 </script>
 </body>
