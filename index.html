@@ -237,6 +237,10 @@ function renderReview(){
    +'</div>';
   document.getElementById("dlBtn").onclick=downloadBackup;
   var sb=document.getElementById("submitBtn"); if(sb) sb.onclick=submitAll;
+  if(state.submitted){
+    if(sb){ sb.disabled=true; sb.textContent="Already submitted"; }
+    document.getElementById("subMsg").innerHTML='<span class="pill-ok">Your scores were already recorded. Thank you — you may close this tab.</span>';
+  }
 }
 /* ============ WIDGETS ============ */
 function scaleHTML(field,q,lo,hi,a,help){
@@ -311,18 +315,23 @@ function buildPayload(){
 }
 function submitAll(){
   var msg=document.getElementById("subMsg");
-  msg.innerHTML="Submitting…";
+  var btn=document.getElementById("submitBtn");
+  if(state.submitted){ msg.innerHTML='<span class="pill-ok">Your scores were already recorded. There is no need to submit again.</span>'; return; }
+  if(state.sending){ return; }
   var payload=buildPayload();
   if(SUBMIT_URL.indexOf("PASTE_")===0){
     msg.innerHTML='<span style="color:var(--accent)">The submission URL has not been set yet. Your answers are saved in this browser; please use the backup download. (Study team: set SUBMIT_URL.)</span>';
     return;
   }
+  state.sending=true; if(btn){btn.disabled=true;} msg.innerHTML="Submitting…";
   fetch(SUBMIT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)})
    .then(function(){
-      state.submitted=true; save();
+      state.submitted=true; state.sending=false; save();
+      if(btn){btn.textContent="Already submitted";}
       msg.innerHTML='<span class="pill-ok">Thank you. Your scores have been recorded.</span> Please do not discuss your scores with other graders. You may keep a backup copy below.';
    })
    .catch(function(){
+      state.sending=false; if(btn){btn.disabled=false;}
       msg.innerHTML='<span style="color:var(--accent)">Submission could not be confirmed. Please use the backup download and send the file to the study team.</span>';
    });
 }
