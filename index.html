@@ -67,6 +67,11 @@
   .metric{margin:0 0 18px}
   .metric .m-q{font-weight:600; font-size:14.5px; margin-bottom:6px}
   .metric .m-help{font-size:12.5px; color:var(--ink-soft); margin:-2px 0 8px}
+  .m-help .help-lead{font-weight:600; color:var(--ink); margin-bottom:4px}
+  .m-help ul.help-list{margin:0; padding-left:17px}
+  .m-help ul.help-list li{margin:2px 0; line-height:1.45}
+  .m-help ul.help-list li.dont{color:var(--accent); list-style:none; margin-left:-13px}
+  .m-help ul.help-list li.dont::before{content:"✗ "; font-weight:700}
   .metric.sub{margin-left:14px; padding-left:14px; border-left:3px solid var(--primary-tint)}
   /* 1–10 scale */
   .scale{display:grid; grid-template-columns:repeat(10,1fr); gap:5px}
@@ -158,9 +163,27 @@ var SUBMIT_URL  = "https://script.google.com/macros/s/AKfycby7n_PJmPWQL1YwQewoik
 var STORAGE_KEY = "vetai_survey_v3";
 var NQ = (typeof SURVEY_DATA !== "undefined") ? SURVEY_DATA.length : 11;
 
-var ACC_HELP = "Is the clinical content correct? Realistic differentials for this signalment, correct drugs / doses / tests, no hallucinated or outdated information. Judge correctness only — NOT completeness, tone, or length (those are scored separately).";
-var COMP_HELP = "Workup breadth only: does it tell the owner what tests to expect, give treatment direction (medical vs surgical, one-time vs lifelong), flag red-flag warning signs, and tailor to the species/breed/age? Differential-diagnosis coverage is scored separately below — do NOT factor DDs into this score.";
-var CLAR_HELP = "Readable and actionable for a non-medical pet owner: structure, plain language, right length, clean formatting. An unprioritised “it could be any of these” differential dump lowers clarity even when each item is individually accurate.";
+var ACC_HELP = "<div class='help-lead'>Is the content clinically correct — aligned with established knowledge?</div>"
+  + "<ul class='help-list'>"
+  + "<li>Realistic differentials for this breed / age / species</li>"
+  + "<li>Correct tests, treatments, drugs and doses</li>"
+  + "<li>No invented (\"hallucinated\") or outdated information</li>"
+  + "<li class='dont'>Don't judge completeness, clarity, or length here</li>"
+  + "</ul>";
+var COMP_HELP = "<div class='help-lead'>How complete and thorough is the practical guidance?</div>"
+  + "<ul class='help-list'>"
+  + "<li>Names the tests the owner should expect</li>"
+  + "<li>Gives treatment direction (medical vs surgical; one-off vs lifelong)</li>"
+  + "<li>Flags red-flag warning signs to watch for</li>"
+  + "<li>Fits the breed / age / species</li>"
+  + "<li class='dont'>Don't score the differential list here (scored below) — longer &ne; more thorough</li>"
+  + "</ul>";
+var CLAR_HELP = "<div class='help-lead'>Easy for a non-vet owner to understand and act on?</div>"
+  + "<ul class='help-list'>"
+  + "<li>Plain language, clear structure, sensible length</li>"
+  + "<li>The owner can tell what to do next</li>"
+  + "<li class='dont'>An unprioritised 'it could be anything' list lowers clarity even if each item is correct</li>"
+  + "</ul>";
 var TRIAGE_OPTS = ["Urgent (24–48 h)","Within days (this week)","Routine (when convenient)"];
 var TRIAGE_OPTS_CONVEYED = TRIAGE_OPTS.concat(["Not clearly stated"]);
 
