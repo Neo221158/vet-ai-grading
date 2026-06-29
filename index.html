@@ -40,7 +40,17 @@
   input:focus, textarea:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-tint)}
   textarea{min-height:80px; resize:vertical}
   .rate-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:18px; align-items:start}
-  .resp-card .resp-scroll{max-height:66vh; overflow:auto; padding-right:6px; white-space:pre-wrap; font-size:var(--resp-size); line-height:1.6; color:#222b39}
+  .resp-card .resp-scroll{max-height:66vh; overflow:auto; padding-right:10px; font-size:var(--resp-size); line-height:1.65; color:#222b39}
+  /* rich response content (faithful to the original chatbot formatting) */
+  .resp-content p{margin:0 0 11px}
+  .resp-content h4{font-size:calc(var(--resp-size) + 2px); font-weight:700; color:var(--ink); line-height:1.3; margin:17px 0 7px}
+  .resp-content ul, .resp-content ol{margin:0 0 12px; padding-left:24px}
+  .resp-content ul{list-style:disc}
+  .resp-content ol{list-style:decimal}
+  .resp-content li{margin:0 0 5px; padding-left:3px}
+  .resp-content strong{color:var(--ink); font-weight:700}
+  .resp-content > :first-child{margin-top:0}
+  .resp-content > :last-child{margin-bottom:0}
   /* BOLD question banner — solid deep-teal header (replaces the old light-green tint) */
   .qbanner{background:linear-gradient(135deg,var(--primary-d),var(--primary)); color:#fff; border-radius:12px;
     padding:15px 18px; margin-bottom:18px; box-shadow:0 3px 12px rgba(21,83,80,.28)}
@@ -97,7 +107,7 @@
   .modal-title{font-size:18px; font-weight:700; margin-bottom:8px}
   .modal-body{font-size:15px; color:var(--ink-soft); margin-bottom:20px; line-height:1.5}
   .modal-body b{color:var(--ink)}
-  .modal-resp{white-space:pre-wrap; max-height:46vh; overflow:auto; margin-top:10px; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; background:#f8fafc; color:#222b39; font-size:14px; line-height:1.6; text-align:left}
+  .modal-resp{max-height:46vh; overflow:auto; margin-top:10px; padding:14px 16px; border:1.5px solid var(--line); border-radius:10px; background:#f8fafc; color:#222b39; font-size:14.5px; line-height:1.65; text-align:left}
   .modal-actions{display:flex; gap:10px}
   .modal-actions .btn{flex:1}
   @media (max-width:880px){ .rate-grid{grid-template-columns:1fr} .resp-card .resp-scroll{max-height:42vh} }
@@ -157,7 +167,7 @@ var TRIAGE_OPTS_CONVEYED = TRIAGE_OPTS.concat(["Not clearly stated"]);
 /* ============ BUILD STEPS ============ */
 var steps = [{type:"welcome"}];
 SURVEY_DATA.forEach(function(q){
-  q.responses.forEach(function(r){ steps.push({type:"rate", q:q.num, question:q.question, letter:r.letter, text:r.text}); });
+  q.responses.forEach(function(r){ steps.push({type:"rate", q:q.num, question:q.question, letter:r.letter, text:r.text, html:r.html}); });
   steps.push({type:"best", q:q.num, question:q.question});
 });
 steps.push({type:"closing"});
@@ -276,7 +286,7 @@ function renderRate(step){
    +'  <div class="card pad resp-card">'
    +'     <span class="chip">Chatbot '+step.letter+'</span>'
    +'     <h2 style="margin-top:10px">Response</h2>'
-   +'     <div class="resp-scroll" id="respText"></div>'
+   +'     <div class="resp-scroll resp-content" id="respText"></div>'
    +'  </div>'
    +'  <div class="card pad">'
    +'     <h2>Score this response</h2>'
@@ -292,7 +302,7 @@ function renderRate(step){
    +     choiceHTML(p+"harm_flag","Could a pet owner acting on this response harm the animal?",["Yes","No","Unsure"],a,"harm","e.g. a contraindicated treatment, false reassurance for an emergency, or delaying urgent care.")
    +'  </div>'
    +'</div>';
-  document.getElementById("respText").textContent = step.text;
+  document.getElementById("respText").innerHTML = step.html || esc(step.text||"");
   wireScale(p+"accuracy"); wireScale(p+"comprehensiveness"); wireScale(p+"clarity");
   wireChoice(p+"most_likely_dd_first");
   wireChoice(p+"triage_conveyed");
@@ -408,15 +418,15 @@ function wireChoice(field,cb){
 function wireBestChoice(field, step){
   var box=document.querySelector('[data-choices="'+field+'"]'); if(!box) return;
   var q = SURVEY_DATA.filter(function(x){ return x.num===step.q; })[0];
-  var textByLetter = {};
-  if(q){ q.responses.forEach(function(r){ textByLetter[r.letter]=r.text; }); }
+  var htmlByLetter = {};
+  if(q){ q.responses.forEach(function(r){ htmlByLetter[r.letter]=r.html || esc(r.text||""); }); }
   box.querySelectorAll("button").forEach(function(btn){
     btn.onclick=function(){
       var v=btn.getAttribute("data-v");
       if(state.answers[field]===v) return;   /* already chosen, no re-confirm */
       var letter=v.replace("Chatbot ","");
       var body = '<p style="margin:0">You picked <b>Chatbot '+letter+'</b>. Please re-read its full response below to make sure it is the one you meant, then confirm.</p>'
-        + '<div class="modal-resp">'+esc(textByLetter[letter]||"(response text unavailable)")+'</div>';
+        + '<div class="modal-resp resp-content">'+(htmlByLetter[letter]||"(response unavailable)")+'</div>';
       showConfirm(body, function(){
         state.answers[field]=v;
         box.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed", x===btn);});
