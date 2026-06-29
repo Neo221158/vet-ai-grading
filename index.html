@@ -268,6 +268,7 @@ function renderWelcome(){
 function renderRate(step){
   var p="q"+step.q+"_"+step.letter+"_";
   var a=state.answers;
+  var needsSpec = (a[p+"specialist_needed"]==="Yes");
   root.innerHTML =
     qbanner(step)
    +'<div class="rate-grid">'
@@ -282,18 +283,23 @@ function renderRate(step){
    +     scaleHTML(p+"comprehensiveness","Comprehensiveness","misses key info","thorough workup",a,COMP_HELP)
    +     scaleHTML(p+"clarity","Clarity for a pet owner","confusing","clear",a,CLAR_HELP)
    +     choiceHTML(p+"most_likely_dd_first","Does the most likely diagnosis of this patient (in your opinion) appear first in the list proposed by the chatbot?",["Yes","No"],a,"narrow","Judge against your own most-likely diagnosis for this case. If it does not appear first — or is not mentioned at all — answer No.")
-   +     choiceHTML(p+"top3_dd","Of your top 3 differentials for this case, how many did this response mention (in any order)?",["0","1","2","3"],a,"narrow")
    +     choiceHTML(p+"triage_conveyed","What triage urgency did THIS response convey to the owner? (What it said — not whether that is correct.)",TRIAGE_OPTS_CONVEYED,a,"triage")
-   +     choiceHTML(p+"referral_mentioned","Did this response recommend seeing an ophthalmology specialist / referral?",["Yes","No"],a,"narrow")
-   +     choiceHTML(p+"harm_flag","Could a pet owner acting on this response harm the animal?",["Yes","No"],a,"harm","e.g. a contraindicated treatment, false reassurance for an emergency, or delaying urgent care.")
+   +     choiceHTML(p+"specialist_needed","In your judgment, does this case warrant an ophthalmology specialist?",["Yes","No"],a,"narrow")
+   +     (needsSpec
+        ? choiceHTML(p+"referral_mentioned","Did this response recommend seeing an ophthalmology specialist / referral?",["Yes","No"],a,"narrow","You judged this case needs a specialist — did this chatbot route the owner there?")
+        : '')
+   +     choiceHTML(p+"harm_flag","Could a pet owner acting on this response harm the animal?",["Yes","No","Unsure"],a,"harm","e.g. a contraindicated treatment, false reassurance for an emergency, or delaying urgent care.")
    +'  </div>'
    +'</div>';
   document.getElementById("respText").textContent = step.text;
   wireScale(p+"accuracy"); wireScale(p+"comprehensiveness"); wireScale(p+"clarity");
   wireChoice(p+"most_likely_dd_first");
-  wireChoice(p+"top3_dd");
   wireChoice(p+"triage_conveyed");
-  wireChoice(p+"referral_mentioned");
+  wireChoice(p+"specialist_needed", function(v){
+    if(v==="No"){ delete state.answers[p+"referral_mentioned"]; save(); }
+    render();   /* re-render so the referral sub-question shows/hides */
+  });
+  if(needsSpec) wireChoice(p+"referral_mentioned");
   wireChoice(p+"harm_flag");
 }
 function renderBest(step){
@@ -327,8 +333,9 @@ function caseStatus(){
   SURVEY_DATA.forEach(function(q){
     q.responses.forEach(function(r){
       var p="q"+q.num+"_"+r.letter+"_";
-      var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","top3_dd","triage_conveyed","referral_mentioned","harm_flag"];
+      var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","triage_conveyed","specialist_needed","harm_flag"];
       need.forEach(function(m){ total++; if(filled(a[p+m])) done++; });
+      if(a[p+"specialist_needed"]==="Yes"){ total++; if(filled(a[p+"referral_mentioned"])) done++; }
     });
     total++; if(filled(a["q"+q.num+"_best"])) done++;   /* best_why is optional */
   });
@@ -431,8 +438,9 @@ function validateCurrent(){
   var step=steps[state.idx], a=state.answers;
   if(step.type==="rate"){
     var p="q"+step.q+"_"+step.letter+"_";
-    var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","top3_dd","triage_conveyed","referral_mentioned","harm_flag"];
+    var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","triage_conveyed","specialist_needed","harm_flag"];
     for(var i=0;i<need.length;i++){ if(!filled(a[p+need[i]])) return "Please answer all items before continuing."; }
+    if(a[p+"specialist_needed"]==="Yes" && !filled(a[p+"referral_mentioned"])) return "Please answer whether this response recommended a specialist referral.";
   }
   if(step.type==="best"){ if(!filled(a["q"+step.q+"_best"])) return "Please choose the response you liked most."; }
   return null;
@@ -449,7 +457,7 @@ function canonicalOrder(){
   var order=["graderId","email","submittedAt"];
   SURVEY_DATA.forEach(function(q){
     ["A","B","C"].forEach(function(L){
-      ["accuracy","comprehensiveness","clarity","most_likely_dd_first","top3_dd","triage_conveyed","referral_mentioned","harm_flag"].forEach(function(m){ order.push("q"+q.num+"_"+L+"_"+m); });
+      ["accuracy","comprehensiveness","clarity","most_likely_dd_first","triage_conveyed","specialist_needed","referral_mentioned","harm_flag"].forEach(function(m){ order.push("q"+q.num+"_"+L+"_"+m); });
     });
     order.push("q"+q.num+"_best","q"+q.num+"_best_why");
   });
