@@ -147,6 +147,7 @@ var SUBMIT_URL  = "https://script.google.com/macros/s/AKfycby7n_PJmPWQL1YwQewoik
 var STORAGE_KEY = "vetai_survey_v3";
 var NQ = (typeof SURVEY_DATA !== "undefined") ? SURVEY_DATA.length : 11;
 
+var ACC_HELP = "Is the clinical content correct? Realistic differentials for this signalment, correct drugs / doses / tests, no hallucinated or outdated information. Judge correctness only — NOT completeness, tone, or length (those are scored separately).";
 var COMP_HELP = "Workup breadth only: does it tell the owner what tests to expect, give treatment direction (medical vs surgical, one-time vs lifelong), flag red-flag warning signs, and tailor to the species/breed/age? Differential-diagnosis coverage is scored separately below — do NOT factor DDs into this score.";
 var CLAR_HELP = "Readable and actionable for a non-medical pet owner: structure, plain language, right length, clean formatting. An unprioritised “it could be any of these” differential dump lowers clarity even when each item is individually accurate.";
 var TRIAGE_OPTS = ["Urgent (24–48 h)","Within days (this week)","Routine (when convenient)"];
@@ -277,7 +278,7 @@ function renderRate(step){
    +'  </div>'
    +'  <div class="card pad">'
    +'     <h2>Score this response</h2>'
-   +     scaleHTML(p+"accuracy","Accuracy","wrong","fully accurate",a)
+   +     scaleHTML(p+"accuracy","Accuracy","wrong","fully accurate",a,ACC_HELP)
    +     scaleHTML(p+"comprehensiveness","Comprehensiveness","misses key info","thorough workup",a,COMP_HELP)
    +     scaleHTML(p+"clarity","Clarity for a pet owner","confusing","clear",a,CLAR_HELP)
    +     choiceHTML(p+"most_likely_dd_first","Does the most likely diagnosis of this patient (in your opinion) appear first in the list proposed by the chatbot?",["Yes","No"],a,"narrow","Judge against your own most-likely diagnosis for this case. If it does not appear first — or is not mentioned at all — answer No.")
