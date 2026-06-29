@@ -93,10 +93,11 @@
   .intro-note{background:var(--primary-tint); border:1px solid #c9e4e2; color:var(--primary-d); border-radius:10px; padding:12px 14px; font-size:13.5px; margin-bottom:18px}
   /* confirm modal */
   .modal-overlay{position:fixed; inset:0; background:rgba(20,30,50,.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px}
-  .modal-box{background:#fff; border-radius:16px; max-width:430px; width:100%; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal-box{background:#fff; border-radius:16px; max-width:560px; width:100%; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.3)}
   .modal-title{font-size:18px; font-weight:700; margin-bottom:8px}
   .modal-body{font-size:15px; color:var(--ink-soft); margin-bottom:20px; line-height:1.5}
   .modal-body b{color:var(--ink)}
+  .modal-resp{white-space:pre-wrap; max-height:46vh; overflow:auto; margin-top:10px; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; background:#f8fafc; color:#222b39; font-size:14px; line-height:1.6; text-align:left}
   .modal-actions{display:flex; gap:10px}
   .modal-actions .btn{flex:1}
   @media (max-width:880px){ .rate-grid{grid-template-columns:1fr} .resp-card .resp-scroll{max-height:42vh} }
@@ -313,7 +314,7 @@ function renderBest(step){
    +'  <div class="field" style="margin-top:18px"><label class="lbl">In 2–3 sentences, why? <span class="muted" style="font-weight:400">(optional)</span></label>'
    +'    <textarea id="bw" placeholder="What made this response the best one for this owner?">'+esc(a[fw]||"")+'</textarea></div>'
    +'</div>';
-  wireBestChoice(f);
+  wireBestChoice(f, step);
   var bw=document.getElementById("bw"); if(bw){ bw.oninput=function(){ state.answers[fw]=bw.value; save(); }; }
 }
 function renderClosing(){
@@ -404,14 +405,19 @@ function wireChoice(field,cb){
     };
   });
 }
-function wireBestChoice(field){
+function wireBestChoice(field, step){
   var box=document.querySelector('[data-choices="'+field+'"]'); if(!box) return;
+  var q = SURVEY_DATA.filter(function(x){ return x.num===step.q; })[0];
+  var textByLetter = {};
+  if(q){ q.responses.forEach(function(r){ textByLetter[r.letter]=r.text; }); }
   box.querySelectorAll("button").forEach(function(btn){
     btn.onclick=function(){
       var v=btn.getAttribute("data-v");
       if(state.answers[field]===v) return;   /* already chosen, no re-confirm */
       var letter=v.replace("Chatbot ","");
-      showConfirm('You picked <b>Chatbot '+letter+'</b> as the best response for this question. Is that your choice?', function(){
+      var body = '<p style="margin:0">You picked <b>Chatbot '+letter+'</b>. Please re-read its full response below to make sure it is the one you meant, then confirm.</p>'
+        + '<div class="modal-resp">'+esc(textByLetter[letter]||"(response text unavailable)")+'</div>';
+      showConfirm(body, function(){
         state.answers[field]=v;
         box.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed", x===btn);});
         save();
