@@ -39,9 +39,13 @@
     font-family:inherit; color:var(--ink); background:#fbfcfe; transition:border-color .15s, box-shadow .15s;}
   input:focus, textarea:focus{outline:none; border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-tint)}
   textarea{min-height:80px; resize:vertical}
-  .rate-grid{display:grid; grid-template-columns:1.15fr .95fr; gap:18px; align-items:start}
-  .resp-card .resp-scroll{max-height:64vh; overflow:auto; padding-right:6px; white-space:pre-wrap; font-size:var(--resp-size); line-height:1.6; color:#222b39}
-  .qbanner{background:var(--primary-tint); border:1px solid #c9e4e2; color:var(--primary-d); border-radius:10px; padding:12px 14px; font-size:var(--resp-size); margin-bottom:16px}
+  .rate-grid{display:grid; grid-template-columns:1.1fr 1fr; gap:18px; align-items:start}
+  .resp-card .resp-scroll{max-height:66vh; overflow:auto; padding-right:6px; white-space:pre-wrap; font-size:var(--resp-size); line-height:1.6; color:#222b39}
+  /* BOLD question banner — solid deep-teal header (replaces the old light-green tint) */
+  .qbanner{background:linear-gradient(135deg,var(--primary-d),var(--primary)); color:#fff; border-radius:12px;
+    padding:15px 18px; margin-bottom:18px; box-shadow:0 3px 12px rgba(21,83,80,.28)}
+  .qb-label{display:block; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#c6e8e5; margin-bottom:5px}
+  .qb-text{display:block; font-size:calc(var(--resp-size) + 1px); font-weight:600; line-height:1.42}
   .textsize{display:flex; align-items:center; gap:5px}
   .textsize button{width:34px; height:30px; border:1.5px solid var(--line); background:#fff; border-radius:8px; cursor:pointer; color:var(--ink); font-weight:700; line-height:1; padding:0; transition:all .12s}
   .textsize button:hover{border-color:var(--primary); background:var(--primary-tint)}
@@ -49,21 +53,24 @@
   .textsize .ts-sm{font-size:12px}
   .textsize .ts-lg{font-size:17px}
   .textsize .ts-reset{font-size:11px; width:auto; padding:0 8px; color:var(--ink-soft)}
-  .qbanner b{display:block; font-size:12px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px; color:var(--primary)}
   .chip{display:inline-block; background:var(--ink); color:#fff; font-size:12px; font-weight:700; padding:3px 10px; border-radius:99px; letter-spacing:.04em}
   .metric{margin:0 0 18px}
-  .metric .m-q{font-weight:600; font-size:14.5px; margin-bottom:8px}
-  .metric .m-help{font-size:12.5px; color:var(--ink-soft); margin:-4px 0 8px}
-  .scale{display:flex; gap:8px}
-  .scale button{flex:1; min-height:48px; border:1.5px solid var(--line); background:#fff; border-radius:10px; font-size:16px; font-weight:700; color:var(--ink); cursor:pointer; transition:all .12s}
+  .metric .m-q{font-weight:600; font-size:14.5px; margin-bottom:6px}
+  .metric .m-help{font-size:12.5px; color:var(--ink-soft); margin:-2px 0 8px}
+  .metric.sub{margin-left:14px; padding-left:14px; border-left:3px solid var(--primary-tint)}
+  /* 1–10 scale */
+  .scale{display:grid; grid-template-columns:repeat(10,1fr); gap:5px}
+  .scale button{min-height:44px; border:1.5px solid var(--line); background:#fff; border-radius:9px; font-size:15px; font-weight:700; color:var(--ink); cursor:pointer; transition:all .12s; padding:0}
   .scale button:hover{border-color:var(--primary); background:var(--primary-tint)}
   .scale button[aria-pressed=true]{background:var(--primary); border-color:var(--primary); color:#fff; box-shadow:0 2px 8px rgba(31,111,107,.35)}
   .scale-ends{display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-soft); margin-top:5px}
+  @media (max-width:560px){ .scale{grid-template-columns:repeat(5,1fr)} }
   .choices{display:flex; gap:8px; flex-wrap:wrap}
-  .choices button{flex:1 1 auto; min-height:48px; padding:0 14px; border:1.5px solid var(--line); background:#fff; border-radius:10px; font-size:14.5px; font-weight:600; color:var(--ink); cursor:pointer; transition:all .12s}
+  .choices button{flex:1 1 auto; min-height:46px; padding:0 14px; border:1.5px solid var(--line); background:#fff; border-radius:10px; font-size:14px; font-weight:600; color:var(--ink); cursor:pointer; transition:all .12s}
   .choices button:hover{border-color:var(--primary); background:var(--primary-tint)}
   .choices button[aria-pressed=true]{background:var(--primary); border-color:var(--primary); color:#fff}
   .choices.harm button[data-v=Yes][aria-pressed=true]{background:var(--accent); border-color:var(--accent)}
+  .choices.narrow button{flex:0 1 auto; min-width:64px}
   .navbar{position:fixed; left:0; right:0; bottom:0; background:rgba(255,255,255,.96); backdrop-filter:blur(8px); border-top:1px solid var(--line); z-index:20}
   .navbar-inner{max-width:var(--maxw); margin:0 auto; padding:12px 18px; display:flex; align-items:center; gap:12px}
   .btn{appearance:none; border:none; border-radius:11px; padding:13px 22px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:transform .06s, background .15s}
@@ -74,11 +81,25 @@
   .btn-ghost:hover{background:#e3e9f1}
   .btn[disabled]{opacity:.45; cursor:not-allowed}
   .nav-spacer{flex:1}
-  .save-note{font-size:12px; color:var(--ink-soft)}
+  .save-note{font-size:12px; color:var(--ink-soft); transition:color .2s}
   .save-note b{color:var(--good)}
+  .save-note.flash{color:var(--good); font-weight:600}
+  .btn-save{background:#eef2f7; color:var(--ink); border:1.5px solid var(--line); padding:10px 16px}
+  .btn-save:hover{background:#e3e9f1; border-color:var(--primary)}
+  .btn-save.saved{background:var(--good,#1f9d57); color:#fff; border-color:var(--good,#1f9d57)}
+  @media (max-width:560px){ .save-note{display:none} .btn-save{padding:10px 12px} }
   .pill-ok{color:var(--good); font-weight:700}
   .banner-warn{background:#fcefe6; border:1px solid #f0c9ad; color:#8a3c12; border-radius:10px; padding:12px 14px; font-size:13.5px; margin-top:14px}
-  @media (max-width:880px){ .rate-grid{grid-template-columns:1fr} .resp-card .resp-scroll{max-height:46vh} }
+  .intro-note{background:var(--primary-tint); border:1px solid #c9e4e2; color:var(--primary-d); border-radius:10px; padding:12px 14px; font-size:13.5px; margin-bottom:18px}
+  /* confirm modal */
+  .modal-overlay{position:fixed; inset:0; background:rgba(20,30,50,.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px}
+  .modal-box{background:#fff; border-radius:16px; max-width:430px; width:100%; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal-title{font-size:18px; font-weight:700; margin-bottom:8px}
+  .modal-body{font-size:15px; color:var(--ink-soft); margin-bottom:20px; line-height:1.5}
+  .modal-body b{color:var(--ink)}
+  .modal-actions{display:flex; gap:10px}
+  .modal-actions .btn{flex:1}
+  @media (max-width:880px){ .rate-grid{grid-template-columns:1fr} .resp-card .resp-scroll{max-height:42vh} }
 </style>
 </head>
 <body>
@@ -100,9 +121,21 @@
 <div class="navbar" id="navbar" style="display:none">
   <div class="navbar-inner">
     <button class="btn btn-ghost" id="backBtn">&larr; Back</button>
-    <span class="save-note" id="saveNote">Progress saved <b>&#10003;</b></span>
+    <button class="btn btn-save" id="saveBtn" title="Save your progress now">&#128190; Save</button>
+    <span class="save-note" id="saveNote">Progress saves automatically</span>
     <div class="nav-spacer"></div>
     <button class="btn btn-primary" id="nextBtn">Next &rarr;</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">Confirm your choice</div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modalCancel">Go back</button>
+      <button class="btn btn-primary" id="modalOk">Yes, that's my pick</button>
+    </div>
   </div>
 </div>
 
@@ -111,9 +144,13 @@
 /* ============ CONFIG ============ */
 var ACCESS_CODE = "OFRI2026";
 var SUBMIT_URL  = "https://script.google.com/macros/s/AKfycby7n_PJmPWQL1YwQewoikg78tQzV6r3nfuLvWPjHx3dB4I9X3Z6CHY2_feEut1hhQvN/exec";
-var STORAGE_KEY = "vetai_survey_v1";
+var STORAGE_KEY = "vetai_survey_v3";
+var NQ = (typeof SURVEY_DATA !== "undefined") ? SURVEY_DATA.length : 11;
 
-var COMP_HELP = "Includes whether the relevant differential diagnoses were mentioned (the causes a clinician would seriously consider, including the can't-miss one), plus suggested tests, treatment direction, red-flag warnings, and signalment-appropriate guidance. NOTE: the chatbot was NOT asked for a most-likely diagnosis or a ranked differential — do not penalise lack of ranking; credit whether appropriate causes were raised, regardless of order.";
+var COMP_HELP = "Workup breadth only: does it tell the owner what tests to expect, give treatment direction (medical vs surgical, one-time vs lifelong), flag red-flag warning signs, and tailor to the species/breed/age? Differential-diagnosis coverage is scored separately below — do NOT factor DDs into this score.";
+var CLAR_HELP = "Readable and actionable for a non-medical pet owner: structure, plain language, right length, clean formatting. An unprioritised “it could be any of these” differential dump lowers clarity even when each item is individually accurate.";
+var TRIAGE_OPTS = ["Urgent (24–48 h)","Within days (this week)","Routine (when convenient)"];
+var TRIAGE_OPTS_CONVEYED = TRIAGE_OPTS.concat(["Not clearly stated"]);
 
 /* ============ BUILD STEPS ============ */
 var steps = [{type:"welcome"}];
@@ -129,6 +166,31 @@ var state = load() || {graderId:"", email:"", answers:{}, idx:0, submitted:false
 
 function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 function load(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){ return null; } }
+
+/* Manual Save: reuses the same save() as autosave — single persistence path,
+   just adds a visible confirmation + last-saved timestamp for reassurance. */
+var saveFlashTimer=null;
+function saveNow(){
+  save();
+  var t=new Date();
+  var hh=("0"+t.getHours()).slice(-2), mm=("0"+t.getMinutes()).slice(-2);
+  var note=document.getElementById("saveNote");
+  var btn=document.getElementById("saveBtn");
+  if(note){
+    note.innerHTML='<b>&#10003;</b> Progress saved &middot; Last saved at '+hh+':'+mm;
+    note.classList.add("flash");
+  }
+  if(btn){ btn.classList.add("saved"); btn.innerHTML='&#10003; Saved'; }
+  if(saveFlashTimer) clearTimeout(saveFlashTimer);
+  saveFlashTimer=setTimeout(function(){
+    if(note) note.classList.remove("flash");
+    if(btn){ btn.classList.remove("saved"); btn.innerHTML='&#128190; Save'; }
+  },2200);
+}
+function wireSaveButton(){
+  var btn=document.getElementById("saveBtn");
+  if(btn) btn.onclick=saveNow;
+}
 
 /* ============ TEXT SIZE ============ */
 var TEXT_MIN=13, TEXT_MAX=24, TEXT_DEFAULT=15, TEXT_STEP=1.5;
@@ -162,6 +224,9 @@ function setProgress(){
   document.getElementById("bar").style.width = pct + "%";
   document.getElementById("plabel").textContent = pct + "%";
 }
+function qbanner(step){
+  return '<div class="qbanner"><span class="qb-label">Question '+step.q+' of '+NQ+' — owner asks</span><span class="qb-text">'+esc(step.question)+'</span></div>';
+}
 function render(){
   var step=steps[state.idx];
   setProgress();
@@ -178,12 +243,12 @@ function renderWelcome(){
    '<div class="card pad" style="max-width:680px;margin:24px auto">'
    +'<div class="eyebrow">Expert Evaluation Study</div>'
    +'<h1>AI Chatbots in Veterinary Ophthalmology</h1>'
-   +'<p class="muted">Thank you for grading. You will see <b>10 owner questions</b>; each is followed by <b>three blinded chatbot responses</b> (Chatbot A, B, C), one per screen. Score each response, then choose the one you liked most for that question.</p>'
+   +'<p class="muted">Thank you for grading. You will see <b>'+NQ+' owner questions</b>. For each one you will score <b>three blinded chatbot responses</b> (Chatbot A, B, C) one per screen, and finally choose the response you liked most.</p>'
    +'<ul class="muted" style="font-size:14px">'
-   +'<li>Each response is on its own screen — read it, score it, click <b>Next</b>.</li>'
+   +'<li>Read each blinded response and score it on its own screen.</li>'
    +'<li>Your progress saves automatically in this browser. You can close the tab and return to continue.</li>'
    +'<li>You can go <b>Back</b> at any time to revise earlier answers.</li>'
-   +'<li>Estimated time: ~50–70 minutes. Please score independently.</li></ul>'
+   +'<li>Estimated time: ~75–90 minutes. Please score independently and do not try to identify the models.</li></ul>'
    +'<div class="field"><label class="lbl">Your name or assigned grader ID</label><input type="text" id="w_id" value="'+esc(state.graderId)+'" placeholder="e.g., Dr. Surname or G-03"></div>'
    +'<div class="field"><label class="lbl">Email</label><input type="email" id="w_email" value="'+esc(state.email)+'" placeholder="you@example.com"></div>'
    +'<div class="field"><label class="lbl">Access code</label><input type="text" id="w_code" placeholder="provided by the study team"></div>'
@@ -203,7 +268,7 @@ function renderRate(step){
   var p="q"+step.q+"_"+step.letter+"_";
   var a=state.answers;
   root.innerHTML =
-    '<div class="qbanner"><b>Question '+step.q+' of 10 — owner asks</b>'+esc(step.question)+'</div>'
+    qbanner(step)
    +'<div class="rate-grid">'
    +'  <div class="card pad resp-card">'
    +'     <span class="chip">Chatbot '+step.letter+'</span>'
@@ -213,29 +278,36 @@ function renderRate(step){
    +'  <div class="card pad">'
    +'     <h2>Score this response</h2>'
    +     scaleHTML(p+"accuracy","Accuracy","wrong","fully accurate",a)
-   +     scaleHTML(p+"comprehensiveness","Comprehensiveness","misses key info","covers DDs / tests / treatment",a,COMP_HELP)
-   +     scaleHTML(p+"clarity","Clarity for a pet owner","confusing","clear",a)
-   +     choiceHTML(p+"harm_flag","Could a pet owner acting on this response harm the animal?",["Yes","No"],a,"harm")
-   +     '<div class="metric" id="harmNoteWrap" style="display:'+(a[p+"harm_flag"]==="Yes"?"block":"none")+'"><div class="m-q">If yes, briefly describe the risk</div><textarea id="hn" placeholder="One short sentence">'+esc(a[p+"harm_note"]||"")+'</textarea></div>'
-   +     choiceHTML(p+"triage","What triage urgency did this response convey?",["Urgent (24–48 h)","Within days (this week)","Routine (when convenient)"],a,"triage")
+   +     scaleHTML(p+"comprehensiveness","Comprehensiveness","misses key info","thorough workup",a,COMP_HELP)
+   +     scaleHTML(p+"clarity","Clarity for a pet owner","confusing","clear",a,CLAR_HELP)
+   +     choiceHTML(p+"most_likely_dd_first","Does the most likely diagnosis of this patient (in your opinion) appear first in the list proposed by the chatbot?",["Yes","No"],a,"narrow","Judge against your own most-likely diagnosis for this case. If it does not appear first — or is not mentioned at all — answer No.")
+   +     choiceHTML(p+"top3_dd","Of your top 3 differentials for this case, how many did this response mention (in any order)?",["0","1","2","3"],a,"narrow")
+   +     choiceHTML(p+"triage_conveyed","What triage urgency did THIS response convey to the owner? (What it said — not whether that is correct.)",TRIAGE_OPTS_CONVEYED,a,"triage")
+   +     choiceHTML(p+"referral_mentioned","Did this response recommend seeing an ophthalmology specialist / referral?",["Yes","No"],a,"narrow")
+   +     choiceHTML(p+"harm_flag","Could a pet owner acting on this response harm the animal?",["Yes","No"],a,"harm","e.g. a contraindicated treatment, false reassurance for an emergency, or delaying urgent care.")
    +'  </div>'
    +'</div>';
   document.getElementById("respText").textContent = step.text;
   wireScale(p+"accuracy"); wireScale(p+"comprehensiveness"); wireScale(p+"clarity");
-  wireChoice(p+"harm_flag", function(v){ document.getElementById("harmNoteWrap").style.display = (v==="Yes")?"block":"none"; });
-  wireChoice(p+"triage");
-  var hn=document.getElementById("hn"); if(hn){ hn.oninput=function(){ state.answers[p+"harm_note"]=hn.value; save(); }; }
+  wireChoice(p+"most_likely_dd_first");
+  wireChoice(p+"top3_dd");
+  wireChoice(p+"triage_conveyed");
+  wireChoice(p+"referral_mentioned");
+  wireChoice(p+"harm_flag");
 }
 function renderBest(step){
-  var f="q"+step.q+"_best"; var a=state.answers;
+  var f="q"+step.q+"_best"; var fw="q"+step.q+"_best_why"; var a=state.answers;
   root.innerHTML =
-    '<div class="qbanner"><b>Question '+step.q+' of 10 — owner asks</b>'+esc(step.question)+'</div>'
-   +'<div class="card pad" style="max-width:680px">'
+    qbanner(step)
+   +'<div class="card pad" style="max-width:720px">'
    +'  <h2>Overall — which response did you like most?</h2>'
    +'  <p class="m-help">Considering accuracy, safety, and usefulness to a worried pet owner. You can use <b>Back</b> to re-read Chatbot A, B, and C.</p>'
    +   choiceHTML(f,"",["Chatbot A","Chatbot B","Chatbot C"],a,"best")
+   +'  <div class="field" style="margin-top:18px"><label class="lbl">In 2–3 sentences, why? <span class="muted" style="font-weight:400">(optional)</span></label>'
+   +'    <textarea id="bw" placeholder="What made this response the best one for this owner?">'+esc(a[fw]||"")+'</textarea></div>'
    +'</div>';
-  wireChoice(f);
+  wireBestChoice(f);
+  var bw=document.getElementById("bw"); if(bw){ bw.oninput=function(){ state.answers[fw]=bw.value; save(); }; }
 }
 function renderClosing(){
   var a=state.answers;
@@ -243,26 +315,31 @@ function renderClosing(){
     '<div class="card pad" style="max-width:680px">'
    +'<h2>Almost done</h2>'
    +'<div class="field"><label class="lbl">Any general comments (optional)</label><textarea id="gn" placeholder="Comments about the questions, responses, or process. Please do NOT speculate about which AI produced which response.">'+esc(a["global_notes"]||"")+'</textarea></div>'
-   +'<div class="field"><label class="lbl">Approximate total time spent (minutes, optional)</label><input type="number" id="tm" value="'+esc(a["time_spent_minutes"]||"")+'" placeholder="e.g., 55"></div>'
+   +'<div class="field"><label class="lbl">Approximate total time spent (minutes, optional)</label><input type="number" id="tm" value="'+esc(a["time_spent_minutes"]||"")+'" placeholder="e.g., 85"></div>'
    +'</div>';
   document.getElementById("gn").oninput=function(){ state.answers["global_notes"]=this.value; save(); };
   document.getElementById("tm").oninput=function(){ state.answers["time_spent_minutes"]=this.value; save(); };
 }
-function renderReview(){
-  var total=0, done=0;
+function caseStatus(){
+  /* dynamic required-field accounting that honours conditionals */
+  var total=0, done=0, a=state.answers;
   SURVEY_DATA.forEach(function(q){
-    ["A","B","C"].forEach(function(L){
-      ["accuracy","comprehensiveness","clarity","harm_flag","triage"].forEach(function(m){
-        total++; var v=state.answers["q"+q.num+"_"+L+"_"+m]; if(v!=null && v!=="") done++;
-      });
+    q.responses.forEach(function(r){
+      var p="q"+q.num+"_"+r.letter+"_";
+      var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","top3_dd","triage_conveyed","referral_mentioned","harm_flag"];
+      need.forEach(function(m){ total++; if(filled(a[p+m])) done++; });
     });
-    total++; if(state.answers["q"+q.num+"_best"]) done++;
+    total++; if(filled(a["q"+q.num+"_best"])) done++;   /* best_why is optional */
   });
-  var complete = (done===total);
+  return {total:total, done:done};
+}
+function renderReview(){
+  var st=caseStatus();
+  var complete = (st.done===st.total);
   root.innerHTML =
     '<div class="card pad" style="max-width:680px">'
    +'<h2>Review &amp; submit</h2>'
-   +'<p class="muted">Required items completed: <span class="pill-ok">'+done+' / '+total+'</span></p>'
+   +'<p class="muted">Required items completed: <span class="pill-ok">'+st.done+' / '+st.total+'</span></p>'
    +(complete? '' : '<div class="banner-warn">Some required items are still blank. Use <b>Back</b> to complete them — the count above will reach 100%.</div>')
    +'<p class="muted" style="font-size:13.5px;margin-top:14px">Grader: <b>'+esc(state.graderId)+'</b> &middot; '+esc(state.email)+'</p>'
    +'<button class="btn btn-primary" id="submitBtn" style="width:100%;margin-top:8px" '+(complete?'':'disabled')+'>Submit my scores</button>'
@@ -279,16 +356,24 @@ function renderReview(){
 /* ============ WIDGETS ============ */
 function scaleHTML(field,q,lo,hi,a,help){
   var sel=a[field], b="";
-  for(var i=1;i<=5;i++){ b+='<button type="button" data-v="'+i+'" aria-pressed="'+(String(sel)===String(i))+'">'+i+'</button>'; }
+  for(var i=1;i<=10;i++){ b+='<button type="button" data-v="'+i+'" aria-pressed="'+(String(sel)===String(i))+'">'+i+'</button>'; }
   return '<div class="metric" data-field="'+field+'"><div class="m-q">'+q+'</div>'
     +(help?'<div class="m-help">'+help+'</div>':'')
     +'<div class="scale">'+b+'</div>'
-    +'<div class="scale-ends"><span>1 · '+lo+'</span><span>'+hi+' · 5</span></div></div>';
+    +'<div class="scale-ends"><span>1 · '+lo+'</span><span>'+hi+' · 10</span></div></div>';
 }
-function choiceHTML(field,q,opts,a,kind){
+function choiceInner(field,q,opts,a,kind){
   var sel=a[field], b="";
   opts.forEach(function(o){ b+='<button type="button" data-v="'+esc(o)+'" aria-pressed="'+(sel===o)+'">'+esc(o)+'</button>'; });
-  return '<div class="metric" data-field="'+field+'">'+(q?'<div class="m-q">'+q+'</div>':'')+'<div class="choices '+(kind||"")+'">'+b+'</div></div>';
+  return (q?'<div class="m-q">'+q+'</div>':'')+'<div class="choices '+(kind||"")+'" data-choices="'+field+'">'+b+'</div>';
+}
+function choiceHTML(field,q,opts,a,kind,help){
+  return '<div class="metric" data-field="'+field+'">'
+    + (q?'<div class="m-q">'+q+'</div>':'')
+    + (help?'<div class="m-help">'+help+'</div>':'')
+    + '<div class="choices '+(kind||"")+'" data-choices="'+field+'">'
+    + opts.map(function(o){ return '<button type="button" data-v="'+esc(o)+'" aria-pressed="'+(a[field]===o)+'">'+esc(o)+'</button>'; }).join('')
+    + '</div></div>';
 }
 function wireScale(field){
   var box=document.querySelector('[data-field="'+field+'"] .scale'); if(!box) return;
@@ -301,7 +386,7 @@ function wireScale(field){
   });
 }
 function wireChoice(field,cb){
-  var box=document.querySelector('[data-field="'+field+'"] .choices'); if(!box) return;
+  var box=document.querySelector('[data-choices="'+field+'"]'); if(!box) return;
   box.querySelectorAll("button").forEach(function(btn){
     btn.onclick=function(){
       var v=btn.getAttribute("data-v");
@@ -311,16 +396,44 @@ function wireChoice(field,cb){
     };
   });
 }
+function wireBestChoice(field){
+  var box=document.querySelector('[data-choices="'+field+'"]'); if(!box) return;
+  box.querySelectorAll("button").forEach(function(btn){
+    btn.onclick=function(){
+      var v=btn.getAttribute("data-v");
+      if(state.answers[field]===v) return;   /* already chosen, no re-confirm */
+      var letter=v.replace("Chatbot ","");
+      showConfirm('You picked <b>Chatbot '+letter+'</b> as the best response for this question. Is that your choice?', function(){
+        state.answers[field]=v;
+        box.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed", x===btn);});
+        save();
+      });
+    };
+  });
+}
+function refreshPressed(field){
+  var box=document.querySelector('[data-choices="'+field+'"]'); if(!box) return;
+  box.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", state.answers[field]===x.getAttribute("data-v")); });
+}
+/* ============ MODAL ============ */
+function showConfirm(bodyHtml, onOk){
+  var ov=document.getElementById("modal");
+  document.getElementById("modalBody").innerHTML=bodyHtml;
+  ov.style.display="flex";
+  var ok=document.getElementById("modalOk"), cancel=document.getElementById("modalCancel");
+  function close(){ ov.style.display="none"; ok.onclick=null; cancel.onclick=null; }
+  ok.onclick=function(){ close(); if(onOk) onOk(); };
+  cancel.onclick=function(){ close(); };
+}
 /* ============ NAV ============ */
 function validateCurrent(){
-  var step=steps[state.idx];
+  var step=steps[state.idx], a=state.answers;
   if(step.type==="rate"){
-    var p="q"+step.q+"_"+step.letter+"_", a=state.answers;
-    var need=["accuracy","comprehensiveness","clarity","harm_flag","triage"];
-    for(var i=0;i<need.length;i++){ if(a[p+need[i]]==null||a[p+need[i]]===""){ return "Please answer all items before continuing."; } }
-    if(a[p+"harm_flag"]==="Yes" && !(a[p+"harm_note"]||"").trim()){ return "You flagged possible harm — please add one short sentence describing the risk."; }
+    var p="q"+step.q+"_"+step.letter+"_";
+    var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","top3_dd","triage_conveyed","referral_mentioned","harm_flag"];
+    for(var i=0;i<need.length;i++){ if(!filled(a[p+need[i]])) return "Please answer all items before continuing."; }
   }
-  if(step.type==="best"){ if(!state.answers["q"+step.q+"_best"]) return "Please choose the response you liked most."; }
+  if(step.type==="best"){ if(!filled(a["q"+step.q+"_best"])) return "Please choose the response you liked most."; }
   return null;
 }
 nextBtn.onclick=function(){
@@ -335,9 +448,9 @@ function canonicalOrder(){
   var order=["graderId","email","submittedAt"];
   SURVEY_DATA.forEach(function(q){
     ["A","B","C"].forEach(function(L){
-      ["accuracy","comprehensiveness","clarity","harm_flag","harm_note","triage"].forEach(function(m){ order.push("q"+q.num+"_"+L+"_"+m); });
+      ["accuracy","comprehensiveness","clarity","most_likely_dd_first","top3_dd","triage_conveyed","referral_mentioned","harm_flag"].forEach(function(m){ order.push("q"+q.num+"_"+L+"_"+m); });
     });
-    order.push("q"+q.num+"_best");
+    order.push("q"+q.num+"_best","q"+q.num+"_best_why");
   });
   order.push("global_notes","time_spent_minutes");
   return order;
@@ -377,10 +490,12 @@ function downloadBackup(){
   URL.revokeObjectURL(u);
 }
 /* ============ UTIL ============ */
+function filled(v){ return v!=null && v!==""; }
 function valOf(id){ var el=document.getElementById(id); return el?el.value.trim():""; }
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
 wireTextSize();
+wireSaveButton();
 applyTextScale();
 render();
 </script>
