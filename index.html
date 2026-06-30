@@ -163,27 +163,26 @@ var SUBMIT_URL  = "https://script.google.com/macros/s/AKfycby7n_PJmPWQL1YwQewoik
 var STORAGE_KEY = "vetai_survey_v3";
 var NQ = (typeof SURVEY_DATA !== "undefined") ? SURVEY_DATA.length : 11;
 
-var ACC_HELP = "<div class='help-lead'>Is what the answer says clinically correct?</div>"
+var ACC_HELP = "<div class='help-lead'>Is the answer clinically correct?</div>"
   + "<ul class='help-list'>"
   + "<li>Realistic differentials for this breed / age / species</li>"
   + "<li>Correct tests, treatments, drugs and doses</li>"
   + "<li>No invented (\"hallucinated\") or outdated claims</li>"
-  + "<li class='dont'>Not whether it covers enough — a brief answer can still be fully accurate (coverage is Comprehensiveness)</li>"
+  + "<li class='dont'>Do not grade comprehensiveness here — a brief answer can still be fully accurate (coverage is Comprehensiveness)</li>"
   + "</ul>";
-var COMP_HELP = "<div class='help-lead'>How complete is the practical guidance?</div>"
+var COMP_HELP = "<div class='help-lead'>Are all the leading differentials listed?</div>"
   + "<ul class='help-list'>"
-  + "<li>Names the tests the owner should expect</li>"
-  + "<li>Gives treatment direction (medical vs surgical; one-off vs lifelong)</li>"
-  + "<li>Flags red-flag warning signs to watch for</li>"
-  + "<li>Fits the breed / age / species</li>"
-  + "<li class='dont'>Not the list of possible diagnoses (scored below), and not just length — longer &ne; more complete</li>"
+  + "<li>Takes the likely DDs and causes into account</li>"
+  + "<li>Names the tests the owner should expect at the clinic</li>"
+  + "<li>Gives proper instructions for home care</li>"
+  + "<li class='dont'>Not just length — a longer answer is not automatically more complete</li>"
   + "</ul>";
-var CLAR_HELP = "<div class='help-lead'>Is it easy for a non-vet owner to understand and act on?</div>"
+var CLAR_HELP = "<div class='help-lead'>Can the owner understand what to do next?</div>"
   + "<ul class='help-list'>"
   + "<li>Plain language and logical structure</li>"
   + "<li>Sensible length, clean formatting</li>"
   + "<li>The owner can tell what to do next</li>"
-  + "<li class='dont'>Not whether it's correct — a clearly written answer can still be wrong</li>"
+  + "<li class='dont'>Do not grade whether the information is correct — that is graded in Accuracy</li>"
   + "</ul>";
 var TRIAGE_OPTS = ["Urgent (24–48 h)","Within days (this week)","Routine (when convenient)"];
 var TRIAGE_OPTS_CONVEYED = TRIAGE_OPTS.concat(["Not clearly stated"]);
@@ -281,11 +280,11 @@ function renderWelcome(){
    +'<h1>AI Chatbots in Veterinary Ophthalmology</h1>'
    +'<p class="muted">Thank you for grading. You will see <b>'+NQ+' owner questions</b>. For each one you will score <b>three blinded chatbot responses</b> (Chatbot A, B, C) one per screen, and finally choose the response you liked most.</p>'
    +'<ul class="muted" style="font-size:14px">'
-   +'<li>Read each blinded response and score it on its own screen.</li>'
-   +'<li>Your progress saves automatically in this browser. You can close the tab and return to continue.</li>'
+   +'<li>Read each blinded response and score it on its screen.</li>'
+   +'<li>Your progress is saved automatically — you can close the tab and return anytime to the next case.</li>'
    +'<li>You can go <b>Back</b> at any time to revise earlier answers.</li>'
-   +'<li>Estimated time: ~75–90 minutes. Please score independently and do not try to identify the models.</li></ul>'
-   +'<div class="field"><label class="lbl">Your name or assigned grader ID</label><input type="text" id="w_id" value="'+esc(state.graderId)+'" placeholder="e.g., Dr. Surname or G-03"></div>'
+   +'<li>Please score independently and do not try to identify the models.</li></ul>'
+   +'<div class="field"><label class="lbl">Your name</label><input type="text" id="w_id" value="'+esc(state.graderId)+'" placeholder="e.g., Dr. Surname"></div>'
    +'<div class="field"><label class="lbl">Email</label><input type="email" id="w_email" value="'+esc(state.email)+'" placeholder="you@example.com"></div>'
    +'<div class="field"><label class="lbl">Access code</label><input type="text" id="w_code" placeholder="provided by the study team"></div>'
    +'<div id="w_err" style="color:var(--accent);font-size:13.5px;min-height:18px"></div>'
@@ -294,7 +293,7 @@ function renderWelcome(){
   document.getElementById("startBtn").onclick=function(){
     var id=valOf("w_id"), em=valOf("w_email"), code=valOf("w_code");
     var err=document.getElementById("w_err");
-    if(!id){err.textContent="Please enter your name or grader ID."; return;}
+    if(!id){err.textContent="Please enter your name."; return;}
     if(!em||em.indexOf("@")<0){err.textContent="Please enter a valid email."; return;}
     if(code.trim()!==ACCESS_CODE){err.textContent="Incorrect access code."; return;}
     state.graderId=id; state.email=em; state.idx=1; save(); render(); scrollTop();
@@ -317,18 +316,20 @@ function renderRate(step){
    +     scaleHTML(p+"accuracy","Accuracy","wrong","fully accurate",a,ACC_HELP)
    +     scaleHTML(p+"comprehensiveness","Comprehensiveness","misses key info","thorough workup",a,COMP_HELP)
    +     scaleHTML(p+"clarity","Clarity for a pet owner","confusing","clear",a,CLAR_HELP)
-   +     choiceHTML(p+"most_likely_dd_first","Does the most likely diagnosis of this patient (in your opinion) appear first in the list proposed by the chatbot?",["Yes","No"],a,"narrow","Judge against your own most-likely diagnosis for this case. If it does not appear first — or is not mentioned at all — answer No.")
-   +     choiceHTML(p+"triage_conveyed","What triage urgency did THIS response convey to the owner? (What it said — not whether that is correct.)",TRIAGE_OPTS_CONVEYED,a,"triage")
-   +     choiceHTML(p+"specialist_needed","In your judgment, does this case warrant an ophthalmology specialist?",["Yes","No"],a,"narrow")
+   +     choiceHTML(p+"leading_dd_top","Does your single most likely differential appear at the top of the chatbot's response list?",["Yes","No"],a,"narrow","Your own #1 differential for this case — is it the first one the chatbot lists?")
+   +     choiceHTML(p+"leading_dd_count","How many of your leading differentials are on this response's list?",["0","1","2","3"],a,"narrow","Judge against your own leading differentials for this case.")
+   +     choiceHTML(p+"triage_conveyed","What triage urgency did this response convey to the owner? (What it said — not whether that is correct.)",TRIAGE_OPTS_CONVEYED,a,"triage")
+   +     choiceHTML(p+"specialist_needed","In your judgment, does this case warrant an ophthalmologist?",["Yes","No"],a,"narrow")
    +     (needsSpec
-        ? choiceHTML(p+"referral_mentioned","Did this response recommend seeing an ophthalmology specialist / referral?",["Yes","No"],a,"narrow","You judged this case needs a specialist — did this chatbot route the owner there?")
+        ? choiceHTML(p+"referral_mentioned","Did this response recommend seeing an ophthalmologist / referral?",["Yes","No"],a,"narrow","You judged this case needs an ophthalmologist — did this chatbot route the owner there?")
         : '')
    +     choiceHTML(p+"harm_flag","Could a pet owner acting on this response harm the animal?",["Yes","No","Unsure"],a,"harm","e.g. a contraindicated treatment, false reassurance for an emergency, or delaying urgent care.")
    +'  </div>'
    +'</div>';
   document.getElementById("respText").innerHTML = step.html || esc(step.text||"");
   wireScale(p+"accuracy"); wireScale(p+"comprehensiveness"); wireScale(p+"clarity");
-  wireChoice(p+"most_likely_dd_first");
+  wireChoice(p+"leading_dd_top");
+  wireChoice(p+"leading_dd_count");
   wireChoice(p+"triage_conveyed");
   wireChoice(p+"specialist_needed", function(v){
     if(v==="No"){ delete state.answers[p+"referral_mentioned"]; save(); }
@@ -357,10 +358,8 @@ function renderClosing(){
     '<div class="card pad" style="max-width:680px">'
    +'<h2>Almost done</h2>'
    +'<div class="field"><label class="lbl">Any general comments (optional)</label><textarea id="gn" placeholder="Comments about the questions, responses, or process. Please do NOT speculate about which AI produced which response.">'+esc(a["global_notes"]||"")+'</textarea></div>'
-   +'<div class="field"><label class="lbl">Approximate total time spent (minutes, optional)</label><input type="number" id="tm" value="'+esc(a["time_spent_minutes"]||"")+'" placeholder="e.g., 85"></div>'
    +'</div>';
   document.getElementById("gn").oninput=function(){ state.answers["global_notes"]=this.value; save(); };
-  document.getElementById("tm").oninput=function(){ state.answers["time_spent_minutes"]=this.value; save(); };
 }
 function caseStatus(){
   /* dynamic required-field accounting that honours conditionals */
@@ -368,7 +367,7 @@ function caseStatus(){
   SURVEY_DATA.forEach(function(q){
     q.responses.forEach(function(r){
       var p="q"+q.num+"_"+r.letter+"_";
-      var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","triage_conveyed","specialist_needed","harm_flag"];
+      var need=["accuracy","comprehensiveness","clarity","leading_dd_top","leading_dd_count","triage_conveyed","specialist_needed","harm_flag"];
       need.forEach(function(m){ total++; if(filled(a[p+m])) done++; });
       if(a[p+"specialist_needed"]==="Yes"){ total++; if(filled(a[p+"referral_mentioned"])) done++; }
     });
@@ -384,7 +383,7 @@ function renderReview(){
    +'<h2>Review &amp; submit</h2>'
    +'<p class="muted">Required items completed: <span class="pill-ok">'+st.done+' / '+st.total+'</span></p>'
    +(complete? '' : '<div class="banner-warn">Some required items are still blank. Use <b>Back</b> to complete them — the count above will reach 100%.</div>')
-   +'<p class="muted" style="font-size:13.5px;margin-top:14px">Grader: <b>'+esc(state.graderId)+'</b> &middot; '+esc(state.email)+'</p>'
+   +'<p class="muted" style="font-size:13.5px;margin-top:14px">Name: <b>'+esc(state.graderId)+'</b> &middot; '+esc(state.email)+'</p>'
    +'<button class="btn btn-primary" id="submitBtn" style="width:100%;margin-top:8px" '+(complete?'':'disabled')+'>Submit my scores</button>'
    +'<button class="btn btn-ghost" id="dlBtn" style="width:100%;margin-top:10px">Download a copy of my answers (backup)</button>'
    +'<div id="subMsg" style="margin-top:14px;font-size:14px"></div>'
@@ -478,9 +477,9 @@ function validateCurrent(){
   var step=steps[state.idx], a=state.answers;
   if(step.type==="rate"){
     var p="q"+step.q+"_"+step.letter+"_";
-    var need=["accuracy","comprehensiveness","clarity","most_likely_dd_first","triage_conveyed","specialist_needed","harm_flag"];
+    var need=["accuracy","comprehensiveness","clarity","leading_dd_top","leading_dd_count","triage_conveyed","specialist_needed","harm_flag"];
     for(var i=0;i<need.length;i++){ if(!filled(a[p+need[i]])) return "Please answer all items before continuing."; }
-    if(a[p+"specialist_needed"]==="Yes" && !filled(a[p+"referral_mentioned"])) return "Please answer whether this response recommended a specialist referral.";
+    if(a[p+"specialist_needed"]==="Yes" && !filled(a[p+"referral_mentioned"])) return "Please answer whether this response recommended an ophthalmologist referral.";
   }
   if(step.type==="best"){ if(!filled(a["q"+step.q+"_best"])) return "Please choose the response you liked most."; }
   return null;
@@ -497,11 +496,11 @@ function canonicalOrder(){
   var order=["graderId","email","submittedAt"];
   SURVEY_DATA.forEach(function(q){
     ["A","B","C"].forEach(function(L){
-      ["accuracy","comprehensiveness","clarity","most_likely_dd_first","triage_conveyed","specialist_needed","referral_mentioned","harm_flag"].forEach(function(m){ order.push("q"+q.num+"_"+L+"_"+m); });
+      ["accuracy","comprehensiveness","clarity","leading_dd_top","leading_dd_count","triage_conveyed","specialist_needed","referral_mentioned","harm_flag"].forEach(function(m){ order.push("q"+q.num+"_"+L+"_"+m); });
     });
     order.push("q"+q.num+"_best","q"+q.num+"_best_why");
   });
-  order.push("global_notes","time_spent_minutes");
+  order.push("global_notes");
   return order;
 }
 function buildPayload(){
