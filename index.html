@@ -170,11 +170,12 @@ var ACC_HELP = "<div class='help-lead'>Is the answer clinically correct?</div>"
   + "<li>No invented (\"hallucinated\") or outdated claims</li>"
   + "<li class='dont'>Do not grade comprehensiveness here — a brief answer can still be fully accurate (coverage is Comprehensiveness)</li>"
   + "</ul>";
-var COMP_HELP = "<div class='help-lead'>Are all the leading differentials listed?</div>"
+var COMP_HELP = "<div class='help-lead'>How complete is the overall picture and practical guidance?</div>"
   + "<ul class='help-list'>"
-  + "<li>Takes the likely DDs and causes into account</li>"
+  + "<li>Mentions other, less-likely causes worth flagging (beyond your top-3)</li>"
   + "<li>Names the tests the owner should expect at the clinic</li>"
-  + "<li>Gives proper instructions for home care</li>"
+  + "<li>Gives treatment direction and follow-up / home-care guidance</li>"
+  + "<li class='dont'>Do not re-score your top-3 most-likely differentials here — those are the two DD questions below</li>"
   + "<li class='dont'>Not just length — a longer answer is not automatically more complete</li>"
   + "</ul>";
 var CLAR_HELP = "<div class='help-lead'>Can the owner understand what to do next?</div>"
@@ -317,7 +318,7 @@ function renderRate(step){
    +     scaleHTML(p+"comprehensiveness","Comprehensiveness","misses key info","thorough workup",a,COMP_HELP)
    +     scaleHTML(p+"clarity","Clarity for a pet owner","confusing","clear",a,CLAR_HELP)
    +     choiceHTML(p+"leading_dd_top","Does your single most likely differential appear at the top of the chatbot's response list?",["Yes","No"],a,"narrow","Your own #1 differential for this case — is it the first one the chatbot lists?")
-   +     choiceHTML(p+"leading_dd_count","How many of your leading differentials are on this response's list?",["0","1","2","3"],a,"narrow","Judge against your own leading differentials for this case.")
+   +     choiceHTML(p+"leading_dd_count","How many of your top three most-likely differentials appear at the top of the chatbot's list?",["0","1","2","3"],a,"narrow","Judge against your own three most-likely diagnoses — do they appear at the top of the chatbot's list, not buried lower down?")
    +     choiceHTML(p+"triage_conveyed","What triage urgency did this response convey to the owner? (What it said — not whether that is correct.)",TRIAGE_OPTS_CONVEYED,a,"triage")
    +     choiceHTML(p+"specialist_needed","In your judgment, does this case warrant an ophthalmologist?",["Yes","No"],a,"narrow")
    +     (needsSpec
